@@ -151,24 +151,16 @@
 ////!
 ////! \return Количество записанных непустых строк.
 ////}----------------------------------------------------------------------------
-//
-//size_t DoRhyme        (FILE *file, const string* rhymes, int num1, int num2,
-//                                                         int num3, int num4);
-
-//struct Point
-//{
-//    int x, y; 
-//};
-
-//#define T Point
-//#include "vector.h"
-
 #include "onegin_text.h"
 
 int custom_line_comparator (const void *l, const void *r);
+int custom_reverse_line_comparator (const void *l, const void *r);
+bool is_chapter_title (const char* str);
+
 
 int main (int argc, char *argv[])
 {
+    
     if (argc != 3)
     {
         fprintf (stderr, "Usage: %s <input-file> <output-file>\n", argv[0]);
@@ -197,109 +189,17 @@ int main (int argc, char *argv[])
         }           
 
         onegin_text_dump (&onegin_text, onegin_output_f, "Евгений Онегин, отсортированный по возрастанию");
-
-        //onegin_text_rhyme_formating ();
+        onegin_text_rhymes_dump (&onegin_text, onegin_output_f, "Евгений Онегин, by Netflix", custom_reverse_line_comparator);
+        
+        fclose (onegin_output_f);
     }
     else
     {
         return 1;
     }
-    //vector_Point vec = {};
-    //vec_ctor_Point (&vec, 3);
-//
-    //printf ("Setting\n");
-    //for (int i = 0; i < vec.size; ++i)
-    //{
-    //    if (vec_set_elem_Point (&vec, i, {i, i + 1}))
-    //        printf ("ERRORRRRRRR\n");
-    //}
-    //printf ("Getting\n");
-    //for (int i = 0; i < vec.size; ++i)
-    //{
-    //    Point el = {};
-    //    if (vec_get_elem_Point (&vec, i, &el))
-    //        printf ("ERRORRRRRRR\n");
-    //    printf ("%d:%d,%d\n", i, el.x, el.y);
-    //}
-//
-    //for (int i = vec.size; i < 30; ++i)
-    //{
-    //    if (vec_push_back_Point (&vec, {3*i, 10*i}))
-    //        printf ("ERRORRRRRRR\n");
-    //}
-//
-    //for (int i = 0; i < vec.size; ++i)
-    //{
-    //    Point el = {};
-    //    if (vec_get_elem_Point (&vec, i, &el))
-    //        printf ("ERRORRRRRRR\n");
-    //    printf ("%d:%d,%d\n", i, el.x, el.y);
-    //}
-    //Buffer buff = {};
-    //buf_ctor (&buff, 5, sizeof (int));
-//
-    //for (int i = 0; i < 5; ++i)
-    //{
-    //    *(int *)buf_get_addr_handled (&buff, i) = i;
-    //}
-//
-    //for (int i = 0; i < 6; ++i)
-    //{
-    //    printf ("%d:%d\n", i, *(int *)buf_get_addr_handled (&buff, i));
-    //}
-//
-    //buf_resize (&buff, 10);
-//
-    //for (int i = 0; i < 10; ++i)
-    //{
-    //    *(int *)buf_get_addr_handled (&buff, i) = i;
-    //}
-//
-    //for (int i = 0; i < 10; ++i)
-    //{
-    //    printf ("%d:%d\n", i, *(int *)buf_get_addr_handled (&buff, i));
-    //}
-    //printf ("Text sorting program\n\n");
-//
-    //string *Onegin_sorted = NULL;
-    //char   *Onegin_buffer = NULL;
-//
-    //size_t nStrings = ReadFile ((argc >= 2) ? INPUT_FILE : DEFAULT_INPUT_FILE,
-    //                             &Onegin_sorted, &Onegin_buffer);
-//
-    //assert (Onegin_sorted != NULL);
-    //assert (Onegin_buffer != NULL);
-//
-    //printf ("Start text sorting...\n");
-//
-    //qsort (Onegin_sorted, nStrings, sizeof (string), StringComp);
-//
-    //printf ("Sorting finished\n\n");
-//
-    //FILE *Answer_file = fopen ((argc >= 3) ? OUTPUT_FILE :
-    //                                         DEFAULT_OUTPUT_FILE, "w");
-    //assert (Answer_file != NULL);
-//
-    //printf ("Start writing to file...\n");
-//
-    //PrintTitle  (Answer_file, "Евгений Онегин, отсортированный по возрастанию");
-    //WriteToFile (Onegin_sorted, nStrings, Answer_file);
-//
-    //PrintTitle  (Answer_file,  "                               Бредогенератор");
-    //PrintRhymes (Onegin_sorted, nStrings, Answer_file);
-//
-    //PrintTitle  (Answer_file, "                   Оригинальный Евгений Онегин");
-    //fprintf     (Answer_file, "%s", Onegin_buffer);
-//
-    //printf ("Writing finished\n");
-//
-    //fclose (Answer_file  );
-    //free   (Onegin_buffer);
-    //free   (Onegin_sorted);
-//
-    //Answer_file   = NULL;
-    //Onegin_buffer = NULL;
-    //Onegin_sorted = NULL;
+
+    onegin_text_dtor (&onegin_text);
+    fclose (onegin_text_f);
 
     return 0;
 }
@@ -312,14 +212,21 @@ int custom_line_comparator (const void *l, const void *r)
     const Token *line1 = ((const Token *)l);
     const Token *line2 = ((const Token *)r);
 
+
     assert (line1->beg != NULL);
     assert (line2->beg != NULL);
+
+    if (is_chapter_title (line1->beg)) return +1;
+    if (is_chapter_title (line2->beg)) return -1;
 
     size_t i = 0;
     size_t j = 0;
     const size_t min_i_J = MIN (line1->size, line2->size);
     for (i = 0, j = 0; i < min_i_J && j < min_i_J; ++i, ++j)
     {
+        while (isspace (line1->beg[i])) ++i;
+        while (isspace (line2->beg[j])) ++j;
+
         if (isgraph (line1->beg[i]))
         {
             i++;
@@ -339,6 +246,45 @@ int custom_line_comparator (const void *l, const void *r)
     }
 
     return line1->beg[i] - line2->beg[j];
+}
+
+int custom_reverse_line_comparator (const void *l, const void *r)
+{
+    assert (l);
+    assert (r);
+
+    const Token *line1 = ((const Token *)l);
+    const Token *line2 = ((const Token *)r);
+
+    assert (line1->beg != NULL);
+    assert (line2->beg != NULL);
+
+    size_t i = line1->size;
+    size_t j = line2->size;
+    for(; i > 0 && j > 0; --i, --j)
+    {
+        printf ("enter the comparator loop (%zu:%zu)\n", i, j);
+        while (i && !isalpha (line1->beg[i])) --i;
+        while (j && !isalpha (line2->beg[j])) --j;
+
+        if (line1->beg[i] != line2->beg[j])
+            return line1->beg[i] - line2->beg[j];
+    }
+
+    return line1->beg[i] - line2->beg[j];
+}
+
+bool is_chapter_title (const char* str)
+{
+    assert (str != NULL);
+
+    for (size_t i = 0; *(str + i) != '\n' && *(str + i) != '\0'; ++i)
+        {
+        if (!(isupper (str[i]) || isspace (str[i])))
+            return false;
+        }
+
+    return true;
 }
 
 ////-----------------------------------------------------------------------------
