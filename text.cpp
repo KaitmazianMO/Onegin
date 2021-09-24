@@ -22,7 +22,7 @@ TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile)
 
     if (vec_ctor_Token (&_this->tokens, 0) != VEC_SUCCESS)
     {
-        return VECTOR_OF_TOKENS_CONSTRUCTING_FAILED;
+        return TEXT_VECTOR_OF_TOKENS_CONSTRUCTING_FAILED;
     }
 
     return TEXT_SUCCESS;
@@ -43,12 +43,22 @@ TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term)
             curr_tok.beg[curr_tok.size] = 0;
 
         if (vec_push_back_Token (&_this->tokens, curr_tok) != VEC_SUCCESS)
-            return TOKENIZING_FAILED;
+            return TEXT_TOKENIZING_FAILED;
     };
 
     return TEXT_SUCCESS;
 }
 
+TEXT_ERRORS text_dtor (Text *_this)
+{
+    assert (_this);
+
+    int err = 0;
+    err |= buf_dtor (&_this->buff);
+    err |= vec_dtor_Token (&_this->tokens);
+    
+    return err ? TEXT_DESTRUCTING_FAILED : TEXT_SUCCESS;
+}
 
 static Token get_token (char *text, const char *delim)
 {

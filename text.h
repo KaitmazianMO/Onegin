@@ -13,12 +13,17 @@ enum TEXT_ERRORS
 {
     TEXT_SUCCESS = 0,
     TEXT_BAD_FILE = 256, TEXT_ALLOCATION_FAILED,
-    TOKENIZING_FAILED, VECTOR_OF_TOKENS_CONSTRUCTING_FAILED
+    TEXT_TOKENIZING_FAILED, TEXT_VECTOR_OF_TOKENS_CONSTRUCTING_FAILED,
+    TEXT_DESTRUCTING_FAILED,
+};
+
+enum TokenFormat
+{
+    NOT_NULL_TERMINATED = 0, NULL_TERMINATED  = 1,
 };
 
 struct Text
 {
-    const char   *name;
     Buffer        buff;
     vector_Token  tokens;
     bool          null_terminated;
@@ -26,5 +31,6 @@ struct Text
 
 TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile);
 TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term);
+TEXT_ERRORS text_dtor (Text *_this);
 
 #endif

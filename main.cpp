@@ -163,33 +163,47 @@
 //#define T Point
 //#include "vector.h"
 
-#include "text.h"
+#include "onegin_text.h"
+
+int custom_line_comparator (const void *l, const void *r);
 
 int main (int argc, char *argv[])
 {
-
-    Text text = {};
-    FILE *pinputf = fopen ("Onegin.txt", "rb");
-
-    printf ("Reading\n");
-    if (text_ctor_by_file (&text, pinputf))
-        printf ("READING FAILED\n");
-
-        
-    printf ("Tokenizing\n");
-    if (text_tokenize (&text, " \t\n", true))
-        printf ("TOKENIZING FAILED\n");
-
-
-    for (int i = 0; i < text.tokens.size; ++i)
+    if (argc != 3)
     {
-        Token tok = {};
-        if (vec_get_elem_Token (&text.tokens, i, &tok))
-            printf ("error in %d iteration\n", i);
-        printf ("%d: \'%s\'(%d)\n", i, tok.beg, tok.size);
+        fprintf (stderr, "Usage: %s <input-file> <output-file>\n", argv[0]);
+        exit (1);
     }
 
+    FILE *onegin_text_f = fopen (argv[1], "rb");
+    if (!onegin_text_f)
+    {
+        fprintf (stderr, "Can't open %s\n", argv[1]);    
+        exit (1);
+    }
 
+    printf ("ctor\n");
+    OneginText onegin_text = {};
+    if (onegin_text_ctor (&onegin_text, onegin_text_f) == ONEGIN_TEXT_SUCCESS)
+    {  
+        printf ("sort\n");
+        onegin_text_sort (&onegin_text, custom_line_comparator);
+        printf ("dump\n");
+        FILE *onegin_output_f = fopen (argv[2], "wb");
+        if (!onegin_output_f)
+        {
+            fprintf (stderr, "Can't open %s\n", argv[2]);  
+            exit (1);  
+        }           
+
+        onegin_text_dump (&onegin_text, onegin_output_f, "Евгений Онегин, отсортированный по возрастанию");
+
+        //onegin_text_rhyme_formating ();
+    }
+    else
+    {
+        return 1;
+    }
     //vector_Point vec = {};
     //vec_ctor_Point (&vec, 3);
 //
@@ -290,6 +304,43 @@ int main (int argc, char *argv[])
     return 0;
 }
 
+int custom_line_comparator (const void *l, const void *r)
+{
+    assert (l);
+    assert (r);
+
+    const Token *line1 = ((const Token *)l);
+    const Token *line2 = ((const Token *)r);
+
+    assert (line1->beg != NULL);
+    assert (line2->beg != NULL);
+
+    size_t i = 0;
+    size_t j = 0;
+    const size_t min_i_J = MIN (line1->size, line2->size);
+    for (i = 0, j = 0; i < min_i_J && j < min_i_J; ++i, ++j)
+    {
+        if (isgraph (line1->beg[i]))
+        {
+            i++;
+            if (isspace (line1->beg[i]))
+                i++;
+        }
+
+        if (isgraph (line2->beg[j]))
+        {
+            j++;
+            if (isspace (line2->beg[j]))
+                j++;
+        }
+
+        if (line1->beg[i] != line2->beg[j])
+            return line1->beg[i] - line2->beg[j];        
+    }
+
+    return line1->beg[i] - line2->beg[j];
+}
+
 ////-----------------------------------------------------------------------------
 //
 //string *CopyText (const string *Text, size_t nLines)
@@ -357,40 +408,6 @@ int main (int argc, char *argv[])
 //
 //
 ////-----------------------------------------------------------------------------
-//
-//int StringComp (const void *void_str1, const void *void_str2)
-//    {
-//    const string *str1 = (string *)void_str1;
-//    const string *str2 = (string *)void_str2;
-//
-//    assert (str1->begin != NULL);
-//    assert (str2->begin != NULL);
-//
-//    size_t i = 0;
-//    size_t j = 0;
-//    for (i = 0, j = 0; i < min (str1->size, str2->size) &&
-//                       j < min (str1->size, str2->size); ++i, ++j)
-//        {
-//        if (isgraph (*(str1->begin + i)))
-//            {
-//            i++;
-//            if (isspace (*(str1->begin + i)))
-//                i++;
-//            }
-//
-//        if (isgraph (*(str2->begin + j)))
-//            {
-//            j++;
-//            if (isspace (*(str2->begin + j)))
-//                j++;
-//            }
-//
-//        if (*(str1->begin + i) != *(str2->begin + j))
-//            return *(str1->begin + i) - *(str2->begin + j);
-//        }
-//
-//    return *(str1->begin + i) - *(str2->begin + j);
-//    }
 //
 ////-----------------------------------------------------------------------------
 //

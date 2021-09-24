@@ -87,7 +87,7 @@ static VEC_ERROR DECLARE (vec_set_elem, T) (VECTOR_T *_this, size_t idx, T val)
 }
 
 
-static VEC_ERROR DECLARE (vec_dtor, ELEM_T) (VECTOR_T *_this)
+static VEC_ERROR DECLARE (vec_dtor, T) (VECTOR_T *_this)
 {
     VEC_VERIFY
 
