@@ -9,6 +9,8 @@
 #define T Token
 #include "vector.h"
 
+typedef bool (*token_verifier_t) (Token tok);
+
 enum TEXT_ERRORS
 {
     TEXT_SUCCESS = 0,
@@ -30,7 +32,8 @@ struct Text
 };
 
 TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile);
-TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term);
+TEXT_ERRORS text_tokenize (Text *_this, const char *delim, 
+                           bool null_term, token_verifier_t tok_verify);
 TEXT_ERRORS text_dtor (Text *_this);
 
 #endif

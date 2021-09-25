@@ -27,6 +27,16 @@ char *read_buff (FILE *pfile, size_t *psize)
     return pbuff;
 }
 
+int dump_buff (char *buff, size_t buff_sz, FILE *file)
+{
+    assert (buff);
+    assert (file);
+
+    const size_t wrote = fwrite (buff, buff_sz, sizeof (*buff), file);
+
+    return wrote == buff_sz ? 0 : 1;
+}
+
 long file_size (FILE *file)
 {
     assert (file);

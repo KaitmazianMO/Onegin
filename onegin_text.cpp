@@ -1,4 +1,5 @@
 #include "onegin_text.h"
+#include "stdlib_addition.h"
 
 #include <string.h>
 #include <time.h>
@@ -10,7 +11,7 @@ static void print_title                     (FILE* file, const char *str);
 size_t      print_4_lines                   (FILE *file, Token tok1, Token tok2, Token tok3, Token tok4);
 static bool print_rhymes                    (vector_Token *tokens, FILE *file);
 
-ONEGIN_TEXT_ERROR onegin_text_ctor (OneginText *_this, FILE *finput)
+ONEGIN_TEXT_ERROR onegin_text_ctor (OneginText *_this, FILE *finput, token_verifier_t tok_verify)
 {
     assert (_this);
     assert (finput);
@@ -18,7 +19,7 @@ ONEGIN_TEXT_ERROR onegin_text_ctor (OneginText *_this, FILE *finput)
     if (text_ctor_by_file (&_this->text, finput))
         return ONEGIN_TEXT_CONSTRUCTING_FAILED;
 
-    if (text_tokenize (&_this->text, "\n", NULL_TERMINATED))
+    if (text_tokenize (&_this->text, "\n", NULL_TERMINATED, tok_verify))
     {
         return ONEGIN_TEXT_TOKENIZING_FAILED;
     }
@@ -45,6 +46,8 @@ ONEGIN_TEXT_ERROR onegin_text_rhymes_dump (OneginText *_this, FILE *fout, const 
     _this->text.tokens.size, sizeof (Token), 
     cmp ? cmp : default_reverse_line_comparator);
 
+    printf ("onegin_text_rhymes_dump: sorted\n");
+
     print_title (fout, title);
     return !print_rhymes (&_this->text.tokens, fout) ?
      ONEGIN_TEXT_SUCCESS : ONEGIN_TEXT_RHYME_PRINTING_ERROR;
@@ -60,6 +63,16 @@ ONEGIN_TEXT_ERROR onegin_text_dump (OneginText *_this, FILE *fout, const char *t
     write_nlines_to_file (&_this->text.tokens, _this->text.tokens.size, fout);
 
     return ONEGIN_TEXT_SUCCESS;
+}
+
+ONEGIN_TEXT_ERROR onegin_text_raw_dump (OneginText *_this, FILE *fout, const char *title)
+{
+    assert (_this);
+    assert (fout);
+    assert (title);
+
+    print_title (fout, title);
+    return dump_buff (_this->text.buff.data, _this->text.buff.capacity, fout) ? ONEGIN_TEXT_SUCCESS : ONEGIN_TEXT_SOMETHING_FAILED_I_DO_NOT_KNOW_WHAT_BUT_AM_SURE_YOU_ARE_A_CLEVER_BOY_SO_YOU_MUST_KNOW_WHAT_HAPPEND;
 }
 
 ONEGIN_TEXT_ERROR onegin_text_dtor (OneginText *_this)
@@ -160,9 +173,9 @@ static bool print_rhymes (vector_Token *tokens, FILE *file)
     {
         if (str_num % step == 0 )
         {
-            if (!(vec_get_elem_Token (tokens, i,     &tok1) && 
-                  vec_get_elem_Token (tokens, j,     &tok2) &&
-                  vec_get_elem_Token (tokens, i + 2, &tok3) &&
+            if (!(vec_get_elem_Token (tokens, i,     &tok1) ||
+                  vec_get_elem_Token (tokens, j,     &tok2) ||
+                  vec_get_elem_Token (tokens, i + 2, &tok3) ||
                   vec_get_elem_Token (tokens, j + 2, &tok4)))
                 str_num += print_4_lines (file, tok1, tok2, tok3, tok4);
             else
@@ -174,9 +187,9 @@ static bool print_rhymes (vector_Token *tokens, FILE *file)
 
         else if (str_num % step == 4 )
         {
-            if (!(vec_get_elem_Token (tokens, i,     &tok1) && 
-                  vec_get_elem_Token (tokens, i + 2, &tok2) &&
-                  vec_get_elem_Token (tokens, j,     &tok3) &&
+            if (!(vec_get_elem_Token (tokens, i,     &tok1) ||
+                  vec_get_elem_Token (tokens, i + 2, &tok2) ||
+                  vec_get_elem_Token (tokens, j,     &tok3) ||
                   vec_get_elem_Token (tokens, j + 2, &tok4)))
                 str_num += print_4_lines (file, tok1, tok2, tok3, tok4);   
             else
@@ -188,9 +201,9 @@ static bool print_rhymes (vector_Token *tokens, FILE *file)
 
         else if (str_num % step == 8 )
         {
-            if (!(vec_get_elem_Token (tokens, i,     &tok1) && 
-                  vec_get_elem_Token (tokens, j,     &tok2) &&
-                  vec_get_elem_Token (tokens, j + 2, &tok3) &&
+            if (!(vec_get_elem_Token (tokens, i,     &tok1) ||
+                  vec_get_elem_Token (tokens, j,     &tok2) ||
+                  vec_get_elem_Token (tokens, j + 2, &tok3) ||
                   vec_get_elem_Token (tokens, i + 2, &tok4)))
                 str_num += print_4_lines (file, tok1, tok2, tok3, tok4);        
             else
@@ -202,7 +215,7 @@ static bool print_rhymes (vector_Token *tokens, FILE *file)
 
         else if (str_num % step == 12)
         {
-            if (!(vec_get_elem_Token (tokens, i,     &tok1) && 
+            if (!(vec_get_elem_Token (tokens, i,     &tok1) || 
                   vec_get_elem_Token (tokens, i + 2, &tok2)))
                 str_num += print_4_lines (file, tok1, tok2, {.beg = NULL}, {.beg = NULL});         
             else

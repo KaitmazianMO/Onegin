@@ -28,7 +28,7 @@ TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile)
     return TEXT_SUCCESS;
 }
 
-TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term)
+TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term, token_verifier_t tok_verify)
 {
     assert (_this);
     assert (delim);
@@ -42,8 +42,11 @@ TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term)
         if (null_term)
             curr_tok.beg[curr_tok.size] = 0;
 
-        if (vec_push_back_Token (&_this->tokens, curr_tok) != VEC_SUCCESS)
-            return TEXT_TOKENIZING_FAILED;
+        if ((tok_verify && tok_verify (curr_tok)) || tok_verify == NULL)
+        {
+            if (vec_push_back_Token (&_this->tokens, curr_tok) != VEC_SUCCESS)
+                return TEXT_TOKENIZING_FAILED;
+        }
     };
 
     return TEXT_SUCCESS;
