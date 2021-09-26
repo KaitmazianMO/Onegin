@@ -30,14 +30,11 @@ int main (int argc, char *argv[])
         exit (1);
     }                                                                             
 
-    printf ("ctor\n");
     OneginText onegin_text = {};
     if (onegin_text_ctor (&onegin_text, onegin_text_f, verify_line) == ONEGIN_TEXT_SUCCESS)
     {  
-        printf ("sort\n");
         onegin_text_sort (&onegin_text, custom_line_comparator);
 
-        printf ("dump\n");
         FILE *onegin_output_f = fopen (argv[2], "wb");
         if (!onegin_output_f)
         {
@@ -72,26 +69,26 @@ int custom_line_comparator (const void *l, const void *r)
 
     size_t i = 0;
     size_t j = 0;
-    for (i = 0, j = 0; i < MIN (str1->size, str2->size) &&
-                       j < MIN (str1->size, str2->size); ++i, ++j)
-        {
+    const size_t min_sz = MIN (str1->size, str2->size);
+    for (i = 0, j = 0; i < min_sz && j < min_sz; ++i, ++j)
+    {
         if (isgraph (*(str1->beg + i)))
-            {
+        {
             i++;
             if (isspace (*(str1->beg + i)))
                 i++;
-            }
+        }
 
         if (isgraph (*(str2->beg + j)))
-            {
+        {
             j++;
             if (isspace (*(str2->beg + j)))
                 j++;
-            }
+        }
 
         if (*(str1->beg + i) != *(str2->beg + j))
             return *(str1->beg + i) - *(str2->beg + j);
-        }
+    }
 
     return *(str1->beg + i) - *(str2->beg + j);
 }

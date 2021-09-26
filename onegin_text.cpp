@@ -46,8 +46,6 @@ ONEGIN_TEXT_ERROR onegin_text_rhymes_dump (OneginText *_this, FILE *fout, const 
     _this->text.tokens.size, sizeof (Token), 
     cmp ? cmp : default_reverse_line_comparator);
 
-    printf ("onegin_text_rhymes_dump: sorted\n");
-
     print_title (fout, title);
     return !print_rhymes (&_this->text.tokens, fout) ?
      ONEGIN_TEXT_SUCCESS : ONEGIN_TEXT_RHYME_PRINTING_ERROR;
@@ -72,7 +70,15 @@ ONEGIN_TEXT_ERROR onegin_text_raw_dump (OneginText *_this, FILE *fout, const cha
     assert (title);
 
     print_title (fout, title);
-    return dump_buff (_this->text.buff.data, _this->text.buff.capacity, fout) ? ONEGIN_TEXT_SUCCESS : ONEGIN_TEXT_SOMETHING_FAILED_I_DO_NOT_KNOW_WHAT_BUT_AM_SURE_YOU_ARE_A_CLEVER_BOY_SO_YOU_MUST_KNOW_WHAT_HAPPEND;
+    for (size_t i = 0; i < _this->text.buff.capacity; ++i)
+    {
+        if (_this->text.buff.data[i] != '\0')
+            fputc (_this->text.buff.data[i], fout);
+        else
+            fputc ('\n', fout);
+    }
+    //dump_buff (_this->text.buff.data, _this->text.buff.capacity, fout)
+    return ONEGIN_TEXT_SUCCESS;
 }
 
 ONEGIN_TEXT_ERROR onegin_text_dtor (OneginText *_this)
