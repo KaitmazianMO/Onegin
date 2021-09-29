@@ -5,6 +5,8 @@
 
 #include "buffer.h"
 #include "c_dangeon.h"
+#include "log.h"
+#include "gcc_trace.h"
 
 #ifndef T
 #define T int
@@ -33,6 +35,8 @@ struct VECTOR_T
 static VEC_ERROR DECLARE (vec_ctor, T) (VECTOR_T *_this, size_t cap)
 {
     assert (_this);
+
+    LOG_MSG (LOG, "FUNCING VECTOR CONSTUCTING");
 
     int err = buf_ctor (VEC_PDATA, cap, sizeof (T));
     RETURN_IF_TRUE (err, VEC_ALLOCATION_FAILED)

@@ -9,6 +9,8 @@
 #include <locale.h>
 
 #include "onegin_text.h"
+#include "log.h"
+#include "gcc_trace.h"
 
 int custom_line_comparator (const void *l, const void *r);
 int custom_reverse_line_comparator (const void *l, const void *r);

@@ -5,6 +5,9 @@
 #include "text.h"
 #include "stdlib_addition.h"    
 
+#include "log.h"
+#include "gcc_trace.h"
+
 static Token get_token (char *text, const char *delim);
 
 TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile)
@@ -32,6 +35,8 @@ TEXT_ERRORS text_tokenize (Text *_this, const char *delim, bool null_term, token
 {
     assert (_this);
     assert (delim);
+
+    LOG_MSG (LOG, "START TOKENISZING");
 
     _this->null_terminated = null_term;
 
