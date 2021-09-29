@@ -2,14 +2,14 @@
 This is a second task in compiler course. 
 The task is simple you need to sort big russian text, for example Evgeniy Onegin by Alexander Pushkin. Then you have to write the text in an output file. After that you have to generate new rhymes wich bysed on Evgeniy Onegin text and also dump in a file. At the end you write basic text in a file.
 To solve the problem was developed a struct OneginText wich based on struct Text:
-```
+```C++
  OneginText
 {
     Text text;
 };
 ```
 Onegin Text supports ctor/dtor functions and it also supports 4 function to work with text.
-```
+```C++
 /*!
  *  \brief Sorts OneginText tokens.
  *  \param cmp:  may be NULL if you want to use default comparator based on strcmp or 
@@ -31,7 +31,7 @@ ONEGIN_TEXT_ERROR onegin_text_dump (OneginText *_this, FILE *fout, const char *t
 ONEGIN_TEXT_ERROR onegin_text_raw_dump (OneginText *_this, FILE *fout, const char *title);
 ```
 The text struct is simple and doesn't support many functions because it basic text working class and if you want to expand functionality of the struct you can follow the OneginText example.
-```
+```C++
 struct Text
 {
     Buffer        buff;
