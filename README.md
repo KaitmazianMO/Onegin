@@ -52,6 +52,6 @@ TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile);
 TEXT_ERRORS text_tokenize (Text *_this, const char *delim, 
                            bool null_term, token_verifier_t tok_verify);
                            
-/*! \brief Construct Text object. Reading all symbols from pfile. */
+/*! \brief Distructs previously constructed Text object. */
 TEXT_ERRORS text_dtor (Text *_this);
 ```
