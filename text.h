@@ -31,9 +31,20 @@ struct Text
     bool          null_terminated;
 };
 
+/*! \brief Construct Text object. Reading all symbols from pfile. */
 TEXT_ERRORS text_ctor_by_file (Text *_this, FILE *pfile);
+
+/*! 
+ * \brief Tokenizing the text of previously constructed Text object. 
+ * \param delim: Text deim symbols.
+ * \param null_retm: cahnging last token symbols to '\0' if it's true
+ * \param tok_verify: Token verificator. Must return true for valid tokens, invalid tokens will be ignored. 
+ */
+
 TEXT_ERRORS text_tokenize (Text *_this, const char *delim, 
                            bool null_term, token_verifier_t tok_verify);
+                           
+/*! \brief Distructs previously constructed Text object. */
 TEXT_ERRORS text_dtor (Text *_this);
 
 #endif
