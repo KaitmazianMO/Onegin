@@ -3,7 +3,7 @@ This is a second task in compiler course.
 The task is simple you need to sort big russian text, for example Evgeniy Onegin by Alexander Pushkin. Then you have to write the text in an output file. After that you have to generate new rhymes wich bysed on Evgeniy Onegin text and also dump in a file. At the end you write basic text in a file.
 To solve the problem was developed a struct OneginText wich based on struct Text:
 ```C++
- OneginText
+struct OneginText
 {
     Text text;
 };
