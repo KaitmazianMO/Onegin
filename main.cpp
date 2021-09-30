@@ -17,8 +17,11 @@ int custom_reverse_line_comparator (const void *l, const void *r);
 bool verify_line (Token tok);
 bool is_chapter_title (const char* str);
 
+LOG_WIHTOUT_TRACE
 int main (int argc, char *argv[])
 {
+    logger_set_log_file_path ("onegin.log");
+
     if (argc != 3)
     {
         fprintf (stderr, "Usage: %s <input-file> <output-file>\n", argv[0]);

@@ -48,55 +48,14 @@ void logger_indent_dec();
 
 LOG_WIHTOUT_TRACE
 void logger_indent_inc();
-    //struct Dumper
-    //{
-    //    __attribute__((no_instrument_function))
-    //    Dumper (const char *dump_title)
-    //    {
-    //        get_instance().dumping = true;
-    //        Logger::get_instance().message (DUMP, dump_title);
-    //    } 
-//
-    //    //__attribute__((no_instrument_function))
-    //    //template <typename ...Args>
-    //    //void print_line (const char *format_line, Args... args)
-    //    //{
-    //    //    fprintf (file, "%*.s", 4*get_instance().indent, ""); // printing 4*indent spaces
-    //    //    fpritnf (format_line, args...);
-    //    //    fputc ('\n', file);            
-    //    //}   
-//
-    //    __attribute__((no_instrument_function))
-    //   ~Dumper()
-    //    {
-    //        get_instance().dumping = false;
-    //    }            
-    //};
-//
-    //__attribute__((no_instrument_function))
-    //size_t indent_inc() { return indent++; }
-    //__attribute__((no_instrument_function))
-    //size_t indent_dec() { return --indent; }
-//
-    //__attribute__((no_instrument_function))
-    //static Logger &get_instance()
-    //{
-    //    static Logger instance (get_file_name());
-    //    return instance;
-    //}
-//
-    //__attribute__((no_instrument_function))
-    //static const char *get_file_name()
-    //{
-    //    return Logger::log_file_name;
-    //}
 
-    //__attribute__((no_instrument_function))
-    //static void set_file_path (const char *path)
-    //{
-    //    if (get_instance().log_file_name == NULL)
-    //        get_instance().log_file_name = path;
-    //}
+LOG_WIHTOUT_TRACE
+void logger_start_dumping (const char *title);
 
+LOG_WIHTOUT_TRACE
+void loger_str_dump (const char *format_line, ...);
+
+LOG_WIHTOUT_TRACE
+void logger_finish_dumping();
 
 #endif

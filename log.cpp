@@ -31,7 +31,7 @@ void logger_message (MSG_TYPE type, const char *format_line, ...)
     if (format_line && instance)
     {
         auto type_s = str_type (type);
-        fprintf (logger_get_instance()->file, "%*.s", 4*indent, ""); // printing 4*indent spaces
+        fprintf (file, "%*.s", 4*indent, ""); // printing 4*indent spaces
         fprintf (file, "[%s] ", type_s);
         if (type != CALL && type != QUIT && type != DUMP) fprintf (file, "- ");
         va_list arg_list_p;
@@ -56,7 +56,7 @@ void logger_message_dateiled (MSG_TYPE type, const char *file_s,
         // fseek (get_instance()->file, SEEK_CURR, -1);
         // fprintf (file, " <%s:%s:%zu>", file_s, func_s, line);
         auto type_s = str_type (type);
-        fprintf (logger_get_instance()->file, "%*.s", 4*indent, ""); // printing 4*indent spaces
+        fprintf (file, "%*.s", 4*indent, ""); // printing 4*indent spaces
         fprintf (file, "[%s] ", type_s);
         if (type != CALL && type != QUIT && type != DUMP) fprintf (file, "- ");
         va_list arg_list_p;
@@ -67,6 +67,35 @@ void logger_message_dateiled (MSG_TYPE type, const char *file_s,
         fputc ('\n', file);
         fflush (file);
     }
+}
+
+void logger_start_dumping (const char *title)
+{
+    logger_message (DUMP, title);
+    logger_get_instance()->dumping = true;
+}
+
+void loger_str_dump (const char *format_line, ...)
+{
+    Logger *instance = logger_get_instance();
+    FILE *file = instance->file;
+    int indent = (int)instance->indent;
+    
+    if (format_line && instance)
+    {
+        fprintf (file, "%*.s", 4*indent, ""); // printing 4*indent spaces
+        va_list arg_list_p;
+        va_start (arg_list_p, format_line);
+        vfprintf (file, format_line, arg_list_p);
+        va_end (arg_list_p);
+        fputc ('\n', file);
+        fflush (file);
+    }
+}
+
+void logger_finish_dumping()
+{
+    logger_get_instance()->dumping = false;
 }
 
 void logger_indent_dec()
